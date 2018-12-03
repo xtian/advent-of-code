@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -27,7 +28,9 @@ fn sum_lines(input: impl Read) -> isize {
 
 fn find_repeated_value(input: impl Read) -> isize {
     let mut current_value = 0;
-    let mut past_values = vec![0];
+    let mut past_values = HashSet::new();
+
+    past_values.insert(0);
 
     let inputs = get_inputs(input).collect::<Vec<_>>();
     let mut cycle = inputs.iter().cycle();
@@ -38,7 +41,7 @@ fn find_repeated_value(input: impl Read) -> isize {
         if past_values.contains(&current_value) {
             return current_value;
         } else {
-            past_values.push(current_value);
+            past_values.insert(current_value);
         }
     }
 }
