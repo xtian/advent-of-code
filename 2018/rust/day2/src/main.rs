@@ -26,10 +26,7 @@ fn main() -> Result<(), &'static str> {
 }
 
 fn find_matching_string(input: impl Read) -> Option<String> {
-    let input: Vec<_> = BufReader::new(input)
-        .lines()
-        .filter_map(|line| line.ok())
-        .collect();
+    let input: Vec<_> = get_inputs(input).collect();
 
     for line_a in input.iter() {
         for line_b in input.iter() {
@@ -57,10 +54,8 @@ fn find_matching_string(input: impl Read) -> Option<String> {
 }
 
 fn generate_checksum(input: impl Read) -> usize {
-    let (two_chars, three_chars) = BufReader::new(input)
-        .lines()
-        .filter_map(|line| line.ok())
-        .fold((0, 0), |(total_two_chars, total_three_chars), line| {
+    let (two_chars, three_chars) =
+        get_inputs(input).fold((0, 0), |(total_two_chars, total_three_chars), line| {
             let mut map: HashMap<char, usize> = HashMap::new();
 
             for c in line.chars() {
@@ -74,6 +69,10 @@ fn generate_checksum(input: impl Read) -> usize {
         });
 
     two_chars * three_chars
+}
+
+fn get_inputs(input: impl Read) -> impl Iterator<Item = String> {
+    BufReader::new(input).lines().filter_map(|line| line.ok())
 }
 
 #[test]
