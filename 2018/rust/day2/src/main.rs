@@ -7,12 +7,53 @@ use std::io::BufReader;
 fn main() -> Result<(), &'static str> {
     let mut args = env::args().skip(1);
 
+    let command = args.next().ok_or("Command required")?;
     let filename = args.next().ok_or("Input file required")?;
     let file = File::open(filename).map_err(|_| "Could not open input file")?;
 
-    println!("{}", generate_checksum(file));
+    match command.as_str() {
+        "checksum" => {
+            println!("{}", generate_checksum(file));
+            Ok(())
+        }
+        "matches" => {
+            let output = find_matching_string(file).ok_or("No match found")?;
+            println!("{}", output);
+            Ok(())
+        }
+        _ => Err("Unrecognized command"),
+    }
+}
 
-    Ok(())
+fn find_matching_string(input: impl Read) -> Option<String> {
+    let input: Vec<_> = BufReader::new(input)
+        .lines()
+        .filter_map(|line| line.ok())
+        .collect();
+
+    for line_a in input.iter() {
+        for line_b in input.iter() {
+            let diff = line_a.char_indices().zip(line_b.chars()).fold(
+                vec![],
+                |mut acc, ((index, char_a), char_b)| {
+                    if char_a != char_b {
+                        acc.push(index);
+                    }
+
+                    acc
+                },
+            );
+
+            if diff.len() == 1 {
+                let (left, right) = line_a.split_at(diff[0]);
+                let right: String = right.chars().skip(1).collect();
+
+                return Some(format!("{}{}", left, right));
+            }
+        }
+    }
+
+    None
 }
 
 fn generate_checksum(input: impl Read) -> usize {
@@ -33,6 +74,13 @@ fn generate_checksum(input: impl Read) -> usize {
         });
 
     two_chars * three_chars
+}
+
+#[test]
+fn can_find_matching_strings() {
+    let seq = "abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz".as_bytes();
+
+    assert_eq!(find_matching_string(seq), Some("fgij".to_string()));
 }
 
 #[test]
