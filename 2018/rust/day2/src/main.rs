@@ -18,13 +18,11 @@ fn main() -> Result<(), &'static str> {
 fn generate_checksum(input: impl Read) -> usize {
     let (two_chars, three_chars) = BufReader::new(input)
         .lines()
-        .filter_map(|line| line.ok().map(|l| l.chars().collect::<Vec<_>>()))
-        .fold((0, 0), |(total_two_chars, total_three_chars), mut chars| {
-            chars.sort();
-
+        .filter_map(|line| line.ok())
+        .fold((0, 0), |(total_two_chars, total_three_chars), line| {
             let mut map: HashMap<char, usize> = HashMap::new();
 
-            for c in chars {
+            for c in line.chars() {
                 *map.entry(c).or_insert(0) += 1;
             }
 
