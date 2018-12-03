@@ -38,10 +38,8 @@ fn find_repeated_value(input: impl Read) -> isize {
     loop {
         current_value += cycle.next().unwrap();
 
-        if past_values.contains(&current_value) {
+        if !past_values.insert(current_value) {
             return current_value;
-        } else {
-            past_values.insert(current_value);
         }
     }
 }
