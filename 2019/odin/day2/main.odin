@@ -50,6 +50,8 @@ main :: proc() {
   for x in 0..99 {
     for y in 0..99 {
       intcode_copy := make([]int, len(intcode));
+      defer delete(intcode_copy);
+
       copy(intcode_copy, intcode);
 
       intcode_copy[1] = x;
