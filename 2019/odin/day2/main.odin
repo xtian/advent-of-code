@@ -5,10 +5,16 @@ import "core:os"
 import "core:strconv"
 import "core:strings"
 
+OPERATIONS :: enum {
+  ADD = 1,
+  MULTIPLY = 2,
+  HALT = 99
+}
+
 run_program :: proc(program: []int) -> []int {
   loop: for i := 0; i < len(program); i += 1 {
-    switch program[i] {
-      case 1:
+    #complete switch OPERATIONS(program[i]) {
+      case .ADD:
         x := program[i + 1];
         y := program[i + 2];
         dest := program[i + 3];
@@ -16,7 +22,7 @@ run_program :: proc(program: []int) -> []int {
         program[dest] = program[x] + program[y];
         i += 3;
 
-      case 2:
+      case .MULTIPLY:
         x := program[i + 1];
         y := program[i + 2];
         dest := program[i + 3];
@@ -24,7 +30,7 @@ run_program :: proc(program: []int) -> []int {
         program[dest] = program[x] * program[y];
         i += 3;
 
-      case 99:
+      case .HALT:
         break loop;
     }
   }
@@ -47,6 +53,8 @@ main :: proc() {
     intcode[i] = strconv.parse_int(x);
   }
 
+  desired_output :: 19690720;
+
   for x in 0..99 {
     for y in 0..99 {
       intcode_copy := make([]int, len(intcode));
@@ -59,7 +67,7 @@ main :: proc() {
 
       out := run_program(intcode_copy[:]);
 
-      if out[0] == 19690720 {
+      if out[0] == desired_output {
         fmt.printf("Program arg 1: %v\n", x);
         fmt.printf("Program arg 2: %v\n", y);
 
