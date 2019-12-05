@@ -7,9 +7,7 @@ import "core:strings"
 
 run_program :: proc(program: []int) -> []int {
   loop: for i := 0; i < len(program); i += 1 {
-    token := program[i];
-
-    switch token {
+    switch program[i] {
       case 1:
         x := program[i + 1];
         y := program[i + 2];
@@ -49,9 +47,22 @@ main :: proc() {
     intcode[i] = strconv.parse_int(x);
   }
 
-  intcode[1] = 12;
-  intcode[2] = 2;
+  for x in 0..99 {
+    for y in 0..99 {
+      intcode_copy := make([]int, len(intcode));
+      copy(intcode_copy, intcode);
 
-  out := run_program(intcode[:]);
-  fmt.printf("Program position 0: %v\n", out[0]);
+      intcode_copy[1] = x;
+      intcode_copy[2] = y;
+
+      out := run_program(intcode_copy[:]);
+
+      if out[0] == 19690720 {
+        fmt.printf("Program arg 1: %v\n", x);
+        fmt.printf("Program arg 2: %v\n", y);
+
+        return;
+      }
+    }
+  }
 }
